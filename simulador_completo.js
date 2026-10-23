@@ -76,9 +76,9 @@
     document.getElementById("egresosCliente").value = "";
  }
 
- function pintarClientes(){
+function pintarClientes(){
     let tbody = document.getElementById("tablaClientes");
-    tbody.innerHTML = ""; // limpiar para no duplicar
+    tbody.innerHTML = ""; // limpiar para no duplicar filas
 
     for (let i = 0; i < clientes.length; i++) {
         let cliente = clientes[i];
@@ -100,12 +100,12 @@
         let tdEgresos = document.createElement("td");
         tdEgresos.textContent = cliente.egresos;
 
-        
+        // Celda de acciones con botón Actualizar
         let tdAcciones = document.createElement("td");
         let btnActualizar = document.createElement("button");
         btnActualizar.textContent = "Actualizar";
         btnActualizar.onclick = function(){
-            alert("Actualizando a: " + cliente.nombre);
+            seleccionarCliente(cliente.cedula);
         };
         tdAcciones.appendChild(btnActualizar);
 
@@ -118,5 +118,79 @@
 
         tbody.appendChild(fila);
     }
-  }
+}
+
+function buscarCliente(cedula){
+    // Recorrer el arreglo buscando por cédula
+    for (let i = 0; i < clientes.length; i++) {
+        if (clientes[i].cedula === cedula) {
+            return clientes[i];  // ✅ existe: devuelve el cliente
+        }
+    }
+    return null;  // ❌ no existe
+}
+
+function seleccionarCliente(cedula){
+    // 1. Buscar el cliente
+    let cliente = buscarCliente(cedula);
+
+    // Si no existe, salimos
+    if (cliente === null) {
+        alert("Cliente no encontrado");
+        return;
+    }
+
+    // 2. Guardarlo en clienteSeleccionado
+    clienteSeleccionado = cliente;
+
+    // 3. Mostrar sus datos en los inputs
+    document.getElementById("cedulaCliente").value = cliente.cedula;
+    document.getElementById("nombreCliente").value = cliente.nombre;
+    document.getElementById("apellidoCliente").value = cliente.apellido;
+    document.getElementById("ingresosCliente").value = cliente.ingresos;
+    document.getElementById("egresosCliente").value = cliente.egresos;
+}
+
+function guardarCliente(){
+    let cedula = document.getElementById("cedulaCliente").value;
+    let nombre = document.getElementById("nombreCliente").value;
+    let apellido = document.getElementById("apellidoCliente").value;
+    let ingresos = Number(document.getElementById("ingresosCliente").value);
+    let egresos = Number(document.getElementById("egresosCliente").value);
+
+    // Buscar si ya existe por cédula
+    let cliente = buscarCliente(cedula);
+
+    if (cliente === null) {
+        // ✅ NO existe → crear
+        let nuevoCliente = {
+            cedula: cedula,
+            nombre: nombre,
+            apellido: apellido,
+            ingresos: ingresos,
+            egresos: egresos
+        };
+        clientes.push(nuevoCliente);
+    } else {
+        // ✅ SÍ existe → actualizar (excepto cédula)
+        cliente.nombre = nombre;
+        cliente.apellido = apellido;
+        cliente.ingresos = ingresos;
+        cliente.egresos = egresos;
+    }
+
+    pintarClientes();
+    limpiar();
+}
+
+function limpiar(){
+    document.getElementById("cedulaCliente").value = "";
+    document.getElementById("nombreCliente").value = "";
+    document.getElementById("apellidoCliente").value = "";
+    document.getElementById("ingresosCliente").value = "";
+    document.getElementById("egresosCliente").value = "";
+}
+
+
+
 
