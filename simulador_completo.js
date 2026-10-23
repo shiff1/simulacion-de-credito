@@ -28,7 +28,7 @@
 
   function guardarTasa (){
     let valor = document.getElementById("tasaInteres").value;
-    let tasaInteres = Number(valor);
+    tasaInteres = Number(valor);
     let mensaje = document.getElementById("mensajeTasa");
     if(tasaInteres >= 10 && tasaInteres <= 20){
       mensaje.innerHTML = "taza configurada correctamente:"+ tasaInteres +"%";
@@ -37,36 +37,6 @@
     }
     
   }
-
-
- function guardarCliente(){
-    let cedula = document.getElementById("cedulaCliente").value;
-    let nombre = document.getElementById("nombreCliente").value;
-    let apellido = document.getElementById("apellidoCliente").value;
-    let ingresos = document.getElementById("ingresosCliente").value;
-    let egresos = document.getElementById("egresosCliente").value;
-
-    
-    ingresos = Number(ingresos);
-    egresos = Number(egresos);
-
-    
-    let cliente = {
-        cedula: cedula,
-        nombre: nombre,
-        apellido: apellido,
-        ingresos: ingresos,
-        egresos: egresos
-    };
-
-    
-    clientes.push(cliente);
-
-    
-    pintarClientes();
-
-    limpiarFormulario();
- }
 
  function limpiarFormulario(){
     document.getElementById("cedulaCliente").value = "";
@@ -190,6 +160,90 @@ function limpiar(){
     document.getElementById("ingresosCliente").value = "";
     document.getElementById("egresosCliente").value = "";
 }
+
+function buscarClienteCredito(){
+    // 1. Tomar el valor del campo de cédula
+    let cedula = document.getElementById("cedulaCredito").value;
+
+    // 2. Buscar el cliente en el arreglo
+    let cliente = buscarCliente(cedula);
+
+    // 4. Si no existe → mensaje
+    if (cliente === null) {
+        document.getElementById("mensajeCredito").innerHTML = "Cliente no encontrado";
+        document.getElementById("datosClienteCredito").innerHTML = "";
+        return;
+    }
+
+    // 3. Si existe → mostrar sus datos dinámicamente
+    document.getElementById("mensajeCredito").innerHTML = "Cliente encontrado";
+
+    document.getElementById("datosClienteCredito").innerHTML = `
+        <h3>Datos del Cliente</h3>
+        <p><strong>Cédula:</strong>${cliente.cedula}</p>
+        <p><strong>Nombre:</strong>${cliente.nombre}</p>
+        <p><strong>Apellido:</strong>${cliente.apellido}</p>
+        <p><strong>Ingresos:</strong>${cliente.ingresos}</p>
+        <p><strong>Egresos:</strong>${cliente.egresos}</p>
+    `;
+}
+
+function calcularCredito(){
+    // Datos del cliente
+    let cedula = document.getElementById("cedulaCredito").value;
+    let cliente = buscarCliente(cedula);
+
+    if (cliente === null) {
+        alert("Primero busca un cliente válido");
+        return;
+    }
+
+    // Datos del crédito (inputs de la sección de créditos)
+    let monto = Number(document.getElementById("montoCredito").value);
+    let plazo = Number(document.getElementById("plazoCredito").value);
+
+    // Capacidad de pago: ingresos - egresos
+    let capacidadPago = cliente.ingresos - cliente.egresos;
+
+    // Total a pagar: monto + interés (tasaInteres es global, ej. 15)
+    let totalPagar = monto + (monto * tasaInteres / 100);
+
+    // Cuota mensual
+    let cuotaMensual = totalPagar / plazo;
+
+    // Resultado: aprobado si la cuota cabe en la capacidad de pago
+    let aprobado = cuotaMensual <= capacidadPago;
+
+    // Guardar para mostrar después
+    creditoAprobado = aprobado;
+    cuotaCalculada = cuotaMensual;
+    montoCalculado = monto;
+    plazoCalculado = plazo;
+
+    // Mostrar resultado
+    mostrarResultadoCredito(capacidadPago, totalPagar, cuotaMensual, aprobado);
+}
+
+function mostrarResultadoCredito(capacidadPago, totalPagar, cuotaMensual, aprobado){
+    let resultado = document.getElementById("resultadoCredito");
+
+    resultado.innerHTML = `
+        Capacidad de pago: ${capacidadPago}<br>
+        Total a pagar: ${totalPagar}<br>
+        Cuota mensual: ${cuotaMensual.toFixed(2)}<br>
+        RESULTADO: ${aprobado ? "APROBADO" : "RECHAZADO"}
+    `;
+
+    // Aplicar estilo según el resultado
+    if (aprobado) {
+        resultado.className = "aprobado";
+    } else {
+        resultado.className = "rechazado";
+    }
+}
+
+
+
 
 
 
